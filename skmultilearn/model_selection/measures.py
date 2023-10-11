@@ -69,12 +69,12 @@ def get_combination_wise_output_matrix(y, order):
     """
     return np.array(
         [
-            set(
+            {
                 tuple(combination)
                 for combination in it.combinations_with_replacement(
                     get_indicator_representation(row), order
                 )
-            )
+            }
             for row in y
         ]
     )

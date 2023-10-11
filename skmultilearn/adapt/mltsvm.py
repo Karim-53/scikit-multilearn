@@ -140,9 +140,7 @@ class MLTSVM(MLClassifierBase):
             np.newaxis, :
         ]  # change to form [[wk1, wk2, ..., wkk]]
         all_distances = (-X_with_bias.dot(self.wk_bk.T)) / wk_norms_multiplicated
-        predicted_y = np.where(all_distances < self.treshold, 1, 0)
-        # TODO: It's possible to add condition to: add label if no labels is in row.
-        return predicted_y
+        return np.where(all_distances < self.treshold, 1, 0)
 
     def _successive_overrelaxation(self, omegaW, Q):
         # Initialization

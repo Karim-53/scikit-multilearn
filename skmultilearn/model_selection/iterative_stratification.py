@@ -127,16 +127,15 @@ def _fold_tie_break(desired_samples_per_fold, M, random_state=check_random_state
     """
     if len(M) == 1:
         return M[0]
-    else:
-        max_val = max(desired_samples_per_fold[M])
-        M_prim = np.where(np.array(desired_samples_per_fold) == max_val)[0]
-        M_prim = np.array([x for x in M_prim if x in M])
-        if random_state:
-            if isinstance(random_state, np.random.RandomState):
-                return random_state.choice(M_prim, 1)[0]
-            else:
-                np.random.seed(random_state)
-        return np.random.choice(M_prim, 1)[0]
+    max_val = max(desired_samples_per_fold[M])
+    M_prim = np.where(np.array(desired_samples_per_fold) == max_val)[0]
+    M_prim = np.array([x for x in M_prim if x in M])
+    if random_state:
+        if isinstance(random_state, np.random.RandomState):
+            return random_state.choice(M_prim, 1)[0]
+        else:
+            np.random.seed(random_state)
+    return np.random.choice(M_prim, 1)[0]
 
 
 def _get_most_desired_combination(samples_with_combination):
@@ -277,7 +276,7 @@ class IterativeStratification(_BaseKFold):
         rows = sp.lil_matrix(y).rows
         rows_used = {i: False for i in range(self.n_samples)}
         all_combinations = []
-        per_row_combinations = [[] for i in range(self.n_samples)]
+        per_row_combinations = [[] for _ in range(self.n_samples)]
         samples_with_combination = {}
         folds = [[] for _ in range(self.n_splits)]
 
@@ -403,5 +402,4 @@ class IterativeStratification(_BaseKFold):
         )
         self._distribute_negative_evidence(rows_used, folds)
 
-        for fold in folds:
-            yield fold
+        yield from folds

@@ -112,7 +112,7 @@ pygments_style = "friendly"
 
 # Example configuration for intersphinx: refer to the Python standard library.
 _python_version_str = "{0.major}.{0.minor}".format(sys.version_info)
-_python_doc_base = "http://docs.python.org/" + _python_version_str
+_python_doc_base = f"http://docs.python.org/{_python_version_str}"
 
 intersphinx_mapping = {
     "python": (_python_doc_base, None),

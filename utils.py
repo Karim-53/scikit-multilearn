@@ -35,7 +35,7 @@ def package():
             for dir in dirs:
                 initFile = os.path.join(root, dir, "__init__.py")
                 if not os.path.isfile(initFile):
-                    print("creating : %s" % initFile)
+                    print(f"creating : {initFile}")
                     open(initFile, "a").close()
 
 
@@ -43,14 +43,10 @@ def lint(full=False):
     from pylint import epylint
 
     sources = [Config.root, Config.meka, Config.skmultilearn]
-    if full:
-        fullReport = "y"
-    else:
-        fullReport = "n"
-
+    fullReport = "y" if full else "n"
     config = '--rcfile ./utils/pylint.config --msg-template="{C}:{msg_id}:{line:3d},{column:2d}:{msg}({symbol})" -r %s %s'
     for dir in sources:
-        print("lint %s" % dir)
+        print(f"lint {dir}")
         epylint.py_run(config % (fullReport, dir), script="pylint")
 
 
@@ -92,7 +88,7 @@ if __name__ == "__main__":
                 step(task)
                 locals()[task]()
             else:
-                print('Error: task "%s" not found' % task)
+                print(f'Error: task "{task}" not found')
                 sys.exit(1)
     else:
         default()
