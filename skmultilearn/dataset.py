@@ -84,7 +84,7 @@ def available_data_sets():
         available datasets and their variants with the key pertaining
         to the :code:`(set_name, variant_name)` and values include md5 and file name on server
     """
-    r = requests.get(_get_download_base_url() + "data.list")
+    r = requests.get(f"{_get_download_base_url()}data.list")
     if r.status_code != 200:
         r.raise_for_status()
     else:
@@ -123,9 +123,7 @@ def download_dataset(set_name, variant, data_home=None):
     data_sets = available_data_sets()
     if (set_name, variant) not in data_sets:
         raise ValueError(
-            "The set {} in variant {} does not exist on server.".format(
-                set_name, variant
-            )
+            f"The set {set_name} in variant {variant} does not exist on server."
         )
 
     md5, name = data_sets[set_name, variant]
@@ -137,28 +135,22 @@ def download_dataset(set_name, variant, data_home=None):
 
     if os.path.exists(target_name):
         if md5 == _get_md5(target_name):
-            print("{}:{} - exists, not redownloading".format(set_name, variant))
+            print(f"{set_name}:{variant} - exists, not redownloading")
             return target_name
         else:
-            print(
-                "{}:{} - exists, but MD5 sum mismatch - redownloading".format(
-                    set_name, variant
-                )
-            )
+            print(f"{set_name}:{variant} - exists, but MD5 sum mismatch - redownloading")
     else:
-        print("{}:{} - does not exists downloading".format(set_name, variant))
+        print(f"{set_name}:{variant} - does not exists downloading")
 
     # not found or broken md5
     _download_single_file(name, target_name)
     found_md5 = _get_md5(target_name)
     if md5 != found_md5:
         raise Exception(
-            "{}: MD5 mismatch {} vs {} - possible download error".format(
-                name, md5, found_md5
-            )
+            f"{name}: MD5 mismatch {md5} vs {found_md5} - possible download error"
         )
 
-    print("Downloaded {}-{}".format(set_name, variant))
+    print(f"Downloaded {set_name}-{variant}")
 
     return target_name
 
@@ -183,10 +175,7 @@ def load_dataset(set_name, variant, data_home=None):
     """
 
     path = download_dataset(set_name, variant, data_home)
-    if path is not None:
-        return load_dataset_dump(path)
-
-    return None
+    return load_dataset_dump(path) if path is not None else None
 
 
 def load_from_arff(
@@ -304,8 +293,8 @@ def save_to_arff(X, y, label_location="end", save_sparse=True, filename=None):
     x_prefix = 0
     y_prefix = 0
 
-    x_attributes = [("X{}".format(i), "NUMERIC") for i in range(X.shape[1])]
-    y_attributes = [("y{}".format(i), [str(0), str(1)]) for i in range(y.shape[1])]
+    x_attributes = [(f"X{i}", "NUMERIC") for i in range(X.shape[1])]
+    y_attributes = [(f"y{i}", [str(0), str(1)]) for i in range(y.shape[1])]
 
     if label_location == "end":
         y_prefix = X.shape[1]
@@ -321,9 +310,9 @@ def save_to_arff(X, y, label_location="end", save_sparse=True, filename=None):
         raise ValueError("Label location not in {start, end}")
 
     if save_sparse:
-        data = [{} for r in range(X.shape[0])]
+        data = [{} for _ in range(X.shape[0])]
     else:
-        data = [[0 for c in range(X.shape[1] + y.shape[1])] for r in range(X.shape[0])]
+        data = [[0 for _ in range(X.shape[1] + y.shape[1])] for _ in range(X.shape[0])]
 
     for keys, value in list(X.items()):
         data[keys[0]][x_prefix + keys[1]] = value
@@ -333,7 +322,7 @@ def save_to_arff(X, y, label_location="end", save_sparse=True, filename=None):
 
     dataset = {
         "description": "traindata",
-        "relation": "traindata: -C {}".format(y.shape[1] * relation_sign),
+        "relation": f"traindata: -C {y.shape[1] * relation_sign}",
         "attributes": attributes,
         "data": data,
     }
@@ -373,14 +362,13 @@ def save_dataset_dump(input_space, labels, feature_names, label_names, filename=
         "labels": label_names,
     }
 
-    if filename is not None:
-        if filename[-4:] != ".bz2":
-            filename += ".bz2"
-
-        with bz2.BZ2File(filename, "wb") as file_handle:
-            pickle.dump(data, file_handle)
-    else:
+    if filename is None:
         return data
+    if filename[-4:] != ".bz2":
+        filename += ".bz2"
+
+    with bz2.BZ2File(filename, "wb") as file_handle:
+        pickle.dump(data, file_handle)
 
 
 def load_dataset_dump(filename):
@@ -405,7 +393,7 @@ def load_dataset_dump(filename):
 
     if not os.path.exists(filename):
         raise IOError(
-            "File {} does not exist, use load_dataset to download file".format(filename)
+            f"File {filename} does not exist, use load_dataset to download file"
         )
 
     if filename[-4:] != ".bz2":

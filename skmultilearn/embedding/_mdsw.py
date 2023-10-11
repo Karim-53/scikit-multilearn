@@ -281,7 +281,7 @@ def _smacof_w(
 
     if hasattr(init, "__array__"):
         init = np.asarray(init).copy()
-        if not n_init == 1:
+        if n_init != 1:
             warnings.warn(
                 "Explicit initial positions passed: "
                 "performing only one init of the MDS instead of %d" % n_init
@@ -291,7 +291,7 @@ def _smacof_w(
     best_pos, best_stress = None, None
 
     if n_jobs == 1:
-        for it in range(n_init):
+        for _ in range(n_init):
             pos, stress, n_iter_ = _smacof_single_w(
                 similarities,
                 n_uq,

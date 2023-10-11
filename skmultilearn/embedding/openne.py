@@ -123,7 +123,7 @@ class OpenNetworkEmbedder:
     ):
         if embedding not in self._EMBEDDINGS:
             raise ValueError(
-                "Embedding must be one of {}".format(", ".join(self._EMBEDDINGS.keys()))
+                f'Embedding must be one of {", ".join(self._EMBEDDINGS.keys())}'
             )
 
         if aggregation_function in self._AGGREGATION_FUNCTIONS:
@@ -134,9 +134,7 @@ class OpenNetworkEmbedder:
             self.aggregation_function = aggregation_function
         else:
             raise ValueError(
-                "Aggregation function must be callable or one of {}".format(
-                    ", ".join(self._AGGREGATION_FUNCTIONS.keys())
-                )
+                f'Aggregation function must be callable or one of {", ".join(self._AGGREGATION_FUNCTIONS.keys())}'
             )
 
         self.embedding = embedding
